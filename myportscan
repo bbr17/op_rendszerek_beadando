@@ -1,0 +1,59 @@
+#!/usr/bin/python3
+import argparse
+import socket
+import sys
+import socket
+from datetime import datetime
+
+parser = argparse.ArgumentParser()
+parser.add_argument("host",
+                    help="display a square of a given number")
+parser.add_argument("-s", "--start", type=int,
+                    help="Starting port number for the port range.")
+parser.add_argument("-e", "--end", type=int,
+                    help="Ending port number for the port range.")
+parser.add_argument("-v", "--verbose", action="store_true",
+                    help="increase output verbosity")
+                  
+args = parser.parse_args()
+
+port_range_start = 1
+port_range_end = 65535
+
+if args.verbose:
+    print("Verbose")
+if args.start:
+    port_range_start = args.start
+if args.end:
+    port_range_end = args.end
+    
+target = socket.gethostbyname(args.host) 
+  
+print("-" * 50)
+print("Scanning Target: " + target)
+print("Scanning started at:" + str(datetime.now()))
+print("-" * 50)
+   
+try:
+    for port in range(port_range_start, port_range_end):
+        if args.verbose:
+            print("Checking port: {}".format(port))
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        socket.setdefaulttimeout(1)
+          
+        result = s.connect_ex((target,port))
+        if result ==0:
+            print("Port {} is open".format(port))
+        s.close()
+          
+except KeyboardInterrupt:
+        print("\n Terminating the program!")
+        sys.exit()
+except socket.gaierror:
+        print("\n Hostname error.")
+        sys.exit()
+except socket.error:
+        print("\ Server error.")
+        sys.exit()
+
+
